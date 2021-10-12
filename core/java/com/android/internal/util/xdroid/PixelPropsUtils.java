@@ -28,6 +28,9 @@ public class PixelPropsUtils {
     private static final String TAG = PixelPropsUtils.class.getSimpleName();
     private static final boolean DEBUG = false;
 
+    private static volatile boolean sIsGms = false;
+    public static final String PACKAGE_GMS = "com.google.android.gms";
+
     private static final Map<String, Object> propsToChange;
     private static final Map<String, Object> propsToChangePixel3XL;
 
@@ -122,6 +125,9 @@ public class PixelPropsUtils {
         if (packageName == null){
             return;
         }
+        if (packageName.equals(PACKAGE_GMS)) {
+            sIsGms = true;
+        }
         if (Arrays.asList(packagesToChange).contains(packageName)){
             if (DEBUG){
                 Log.d(TAG, "Defining props for: " + packageName);
@@ -135,7 +141,7 @@ public class PixelPropsUtils {
                 setPropValue(key, value);
             }
         }
-        
+
         if (Arrays.asList(packagesToChangePixel3XL).contains(packageName)){
             if (DEBUG){
                 Log.d(TAG, "Defining props for: " + packageName);
@@ -146,7 +152,7 @@ public class PixelPropsUtils {
                 setPropValue(key, value);
             }
         }
-        
+
         if (Arrays.asList(packagesToChangeROG1).contains(packageName)) {
             if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
             for (Map.Entry<String, Object> prop : propsToChangeROG1.entrySet()) {
@@ -155,7 +161,7 @@ public class PixelPropsUtils {
                 setPropValue(key, value);
             }
         }
-        
+
         if (Arrays.asList(packagesToChangeXP5).contains(packageName)) {
             if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
             for (Map.Entry<String, Object> prop : propsToChangeXP5.entrySet()) {
@@ -164,7 +170,7 @@ public class PixelPropsUtils {
                 setPropValue(key, value);
             }
         }
-        
+
         if (Arrays.asList(packagesToChangeOP8P).contains(packageName)) {
             if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
             for (Map.Entry<String, Object> prop : propsToChangeOP8P.entrySet()) {
@@ -173,7 +179,7 @@ public class PixelPropsUtils {
                 setPropValue(key, value);
             }
         }
-    
+
         // Set proper indexing fingerprint
         if (packageName.equals("com.google.android.settings.intelligence")){
             setPropValue("FINGERPRINT", Build.XDROID_FINGERPRINT);
@@ -191,6 +197,18 @@ public class PixelPropsUtils {
             field.setAccessible(false);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             Log.e(TAG, "Failed to set prop " + key, e);
+        }
+    }
+
+    private static boolean isCallerSafetyNet() {
+        return Arrays.stream(Thread.currentThread().getStackTrace())
+	    .anyMatch(elem -> elem.getClassName().contains("DroidGuard"));
+    }
+
+    public static void onEngineGetCertificateChain() {
+        // Check stack for SafetyNet
+        if (sIsGms && isCallerSafetyNet()) {
+            throw new UnsupportedOperationException();
         }
     }
 }
