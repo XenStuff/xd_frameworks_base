@@ -102,7 +102,7 @@ public class PixelPropsUtils {
         propsToChange.put("MANUFACTURER", "Google");
         propsToChange.put("DEVICE", "redfin");
         propsToChange.put("PRODUCT", "redfin");
-        propsToChange.put("MODEL", "Pixel 5");
+        propsToChange.put("MODEL", "Pixel 5" + " ");
         propsToChange.put("FINGERPRINT", "google/redfin/redfin:11/RQ3A.211001.001/7641976:user/release-keys");
         propsToChangePixel3XL = new HashMap<>();
         propsToChangePixel3XL.put("BRAND", "google");
